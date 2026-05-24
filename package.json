@@ -1,0 +1,36 @@
+{
+  "name": "ci-failure-explainer",
+  "version": "0.1.0",
+  "description": "Extract likely failure causes, commands, files, and next fixes from CI logs.",
+  "type": "module",
+  "bin": {
+    "ci-failure-explainer": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js"
+  },
+  "keywords": [
+    "cli",
+    "developer-tools",
+    "open-source",
+    "ai-workflow"
+  ],
+  "author": "niuxinhuai",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/niuxinhuai/ci-failure-explainer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/niuxinhuai/ci-failure-explainer/issues"
+  },
+  "homepage": "https://github.com/niuxinhuai/ci-failure-explainer#readme",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
