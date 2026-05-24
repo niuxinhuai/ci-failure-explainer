@@ -22,24 +22,30 @@ npm link
 ci-failure-explainer --help
 ```
 
+### Features
+
+- Reads log files or stdin.
+- Detects test, build, lint, dependency, network, permission, and quota failures.
+- Reports first error-like line, file references, commands, context lines, and next steps.
+- Supports Markdown and JSON output.
+
 ### Usage
 
-Read from a log file or stdin.
-
 ```bash
-ci-failure-explainer ci.log
-cat ci.log | ci-failure-explainer
-ci-failure-explainer ci.log --json
+ci-failure-explainer examples/github-actions.log
+cat ci.log | ci-failure-explainer --context 2
+ci-failure-explainer ci.log --json --max-findings 20
 ```
 
-### Status
+### Automation
 
-This is an MVP designed to be useful immediately and easy to extend. It has no runtime dependencies and targets Node.js 18+.
+Use JSON output when feeding the result into another automation step.
 
 ### Test
 
 ```bash
 npm test
+npm --cache /tmp/npm-cache pack --dry-run .
 ```
 
 ## 中文
@@ -58,22 +64,28 @@ npm link
 ci-failure-explainer --help
 ```
 
+### 功能
+
+- 支持读取日志文件或标准输入。
+- 识别测试、构建、lint、依赖、网络、权限、配额等失败类型。
+- 输出首个疑似错误行、文件引用、命令、上下文和下一步建议。
+- 支持 Markdown 和 JSON 输出。
+
 ### 用法
 
-读取日志文件或标准输入。
-
 ```bash
-ci-failure-explainer ci.log
-cat ci.log | ci-failure-explainer
-ci-failure-explainer ci.log --json
+ci-failure-explainer examples/github-actions.log
+cat ci.log | ci-failure-explainer --context 2
+ci-failure-explainer ci.log --json --max-findings 20
 ```
 
-### 当前状态
+### 自动化
 
-这是一个可以直接使用的 MVP，重点是小、清晰、容易二次开发。运行时无第三方依赖，要求 Node.js 18+。
+Use JSON output when feeding the result into another automation step.
 
 ### 测试
 
 ```bash
 npm test
+npm --cache /tmp/npm-cache pack --dry-run .
 ```

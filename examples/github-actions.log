@@ -1,0 +1,6 @@
+Run npm test
+npm test
+FAIL test/app.test.js
+AssertionError: expected true received false
+src/app.js:12:3
+Error: Process completed with exit code 1.
