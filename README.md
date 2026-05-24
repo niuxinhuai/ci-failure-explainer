@@ -27,12 +27,14 @@ ci-failure-explainer --help
 - Reads log files or stdin.
 - Detects test, build, lint, dependency, network, permission, and quota failures.
 - Reports first error-like line, file references, commands, context lines, and next steps.
+- Supports provider hints for GitHub Actions, GitLab CI, and CircleCI.
 - Supports Markdown and JSON output.
 
 ### Usage
 
 ```bash
 ci-failure-explainer examples/github-actions.log
+ci-failure-explainer examples/github-actions.log --provider github
 cat ci.log | ci-failure-explainer --context 2
 ci-failure-explainer ci.log --json --max-findings 20
 ```
@@ -69,6 +71,7 @@ ci-failure-explainer --help
 - 支持读取日志文件或标准输入。
 - 识别测试、构建、lint、依赖、网络、权限、配额等失败类型。
 - 输出首个疑似错误行、文件引用、命令、上下文和下一步建议。
+- 支持 GitHub Actions、GitLab CI、CircleCI 的 provider 标记提取。
 - 支持 Markdown 和 JSON 输出。
 
 ### 用法

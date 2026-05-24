@@ -18,11 +18,12 @@ function usage() {
   console.log(`ci-failure-explainer v${VERSION}
 
 Usage:
-  ci-failure-explainer [log-file] [--json] [--context 2] [--max-findings 12]
+  ci-failure-explainer [log-file] [--provider github|gitlab|circle] [--json] [--context 2] [--max-findings 12]
   cat ci.log | ci-failure-explainer --json
 
 Options:
   --json              Print machine-readable JSON.
+  --provider <name>   Add provider-specific extraction hints.
   --context <n>       Include n nearby log lines around each finding. Default: 1.
   --max-findings <n>  Limit findings. Default: 12.
   --version           Print version.
@@ -39,6 +40,7 @@ if (has('--version')) {
 }
 
 const json = has('--json');
+const provider = value('--provider', 'generic');
 const contextSize = Number(value('--context', '1'));
 const maxFindings = Number(value('--max-findings', '12'));
 const file = args.find((arg, index) => !arg.startsWith('-') && args[index - 1] !== '--context' && args[index - 1] !== '--max-findings');
@@ -91,8 +93,24 @@ const commandPattern = /^\s*(npm|pnpm|yarn|bun|pytest|python|node|go test|cargo|
 const commands = [...new Set(lines.filter((line) => commandPattern.test(line.trim())).map((line) => line.trim()))];
 const files = [...new Set(input.match(/[\w./@-]+\.(js|ts|tsx|jsx|py|java|kt|go|rs|swift|ets|json|yaml|yml|md|sql):\d+(?::\d+)?/g) || [])];
 const firstErrorIndex = lines.findIndex((line) => /error|failed|exception|traceback/i.test(line));
+function providerHints(name) {
+  if (name === 'github') {
+    const groups = lines.filter((line) => line.startsWith('##[group]') || line.startsWith('##[error]')).slice(0, 20);
+    return { provider: name, markers: groups };
+  }
+  if (name === 'gitlab') {
+    const sections = lines.filter((line) => /section_start|section_end|ERROR: Job failed/.test(line)).slice(0, 20);
+    return { provider: name, markers: sections };
+  }
+  if (name === 'circle') {
+    const steps = lines.filter((line) => /^#!/.test(line) || /Exited with code/.test(line)).slice(0, 20);
+    return { provider: name, markers: steps };
+  }
+  return { provider: name, markers: [] };
+}
 const result = {
   source: file ? path.resolve(file) : 'stdin',
+  provider: providerHints(provider),
   likelyCause: findings[0]?.type || 'unknown',
   firstErrorLine: firstErrorIndex >= 0 ? firstErrorIndex + 1 : null,
   findings: findings.slice(0, maxFindings),
@@ -109,6 +127,7 @@ if (json) {
 console.log(`# CI Failure Explanation
 
 Source: ${result.source}
+Provider: ${result.provider.provider}
 Likely cause: ${result.likelyCause}
 ${result.firstErrorLine ? `First error-like line: ${result.firstErrorLine}` : 'First error-like line: not detected'}
 
@@ -120,6 +139,9 @@ ${result.commands.length ? result.commands.map((cmd) => `- ${cmd}`).join('\n') :
 
 ## Files mentioned
 ${result.files.length ? result.files.map((f) => `- ${f}`).join('\n') : '- No file:line references detected.'}
+
+## Provider markers
+${result.provider.markers.length ? result.provider.markers.map((line) => `- ${line}`).join('\n') : '- No provider-specific markers detected.'}
 
 ## Suggested next steps
 ${result.nextSteps.length ? result.nextSteps.map((step) => `- ${step}`).join('\n') : '- Re-run the failing job locally with verbose logging and inspect the earliest error.'}
